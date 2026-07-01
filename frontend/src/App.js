@@ -1,60 +1,151 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./App.css";
 
 function App() {
+  const [users, setUsers] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [technology, setTechnology] = useState("");
-  const [users, setUsers] = useState([]);
-
-  const submitForm = async () => {
-    await axios.post("http://localhost:5000/register", {
-      name,
-      email,
-      technology,
-    });
-    fetchUsers();
-  };
+  const [search, setSearch] = useState("");
+  const [editingId, setEditingId] = useState(null);
 
   const fetchUsers = async () => {
-    const res = await axios.get("http://localhost:5000/users");
-    setUsers(res.data);
+    try {
+      const res = await axios.get("http://localhost:5000/users");
+      setUsers(res.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
+  const handleSubmit = async () => {
+    try {
+      if (editingId) {
+        await axios.put(
+          `http://localhost:5000/users/${editingId}`,
+          {
+            name,
+            email,
+            technology,
+          }
+        );
+      } else {
+        await axios.post(
+          "http://localhost:5000/register",
+          {
+            name,
+            email,
+            technology,
+          }
+        );
+      }
+
+      setName("");
+      setEmail("");
+      setTechnology("");
+      setEditingId(null);
+
+      fetchUsers();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleEdit = (user) => {
+    setName(user.name);
+    setEmail(user.email);
+    setTechnology(user.technology);
+    setEditingId(user._id);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/users/${id}`);
+      fetchUsers();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Internship Form</h2>
+    <div className="container">
+      <h1>Internship Management System</h1>
+
+      <div className="form-box">
+        <input
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="text"
+          placeholder="Technology"
+          value={technology}
+          onChange={(e) => setTechnology(e.target.value)}
+        />
+
+        <button onClick={handleSubmit}>
+          {editingId ? "Update User" : "Add User"}
+        </button>
+      </div>
 
       <input
-        placeholder="Name"
-        onChange={(e) => setName(e.target.value)}
-      /><br/><br/>
+        className="search"
+        type="text"
+        placeholder="Search by Name..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
 
-      <input
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      /><br/><br/>
+      <h2>Registered Interns</h2>
 
-      <input
-        placeholder="Technology"
-        onChange={(e) => setTechnology(e.target.value)}
-      /><br/><br/>
+      {filteredUsers.map((user) => (
+        <div className="card" key={user._id}>
+          <p>
+            <strong>Name:</strong> {user.name}
+          </p>
 
-      <button onClick={submitForm}>Submit</button>
+          <p>
+            <strong>Email:</strong> {user.email}
+          </p>
 
-      <h3>Users List</h3>
+          <p>
+            <strong>Technology:</strong> {user.technology}
+          </p>
 
-      <ul>
-        {users.map((u, i) => (
-          <li key={i}>
-            {u.name} - {u.email} - {u.technology}
-          </li>
-        ))}
-      </ul>
+          <button
+            className="edit-btn"
+            onClick={() => handleEdit(user)}
+          >
+            Edit
+          </button>
+
+          <button
+            className="delete-btn"
+            onClick={() => handleDelete(user._id)}
+          >
+            Delete
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
