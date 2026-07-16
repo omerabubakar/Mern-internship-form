@@ -56,10 +56,13 @@ function App() {
       return;
     }
 
-    if (!email.includes("@")) {
-      setError("Please enter a valid email");
-      return;
-    }
+    const emailPattern =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (!emailPattern.test(email)) {
+  setError("Please enter a valid email");
+  return;
+}
 
     try {
       if (editingId) {
@@ -173,6 +176,13 @@ function App() {
   return (
     <div className="container">
       <h1>Advanced Internship Management System</h1>
+      <button
+  className="logout-btn"
+  onClick={() => setLoggedIn(false)}
+>
+  Logout
+</button>
+
 
       {message && (
         <p className="success">{message}</p>
@@ -240,6 +250,9 @@ function App() {
       </select>
 
       <h2>Registered Interns</h2>
+      {currentUsers.length === 0 && (
+  <p>No users found.</p>
+)}
 
       {currentUsers.map((user) => (
         <div className="card" key={user._id}>

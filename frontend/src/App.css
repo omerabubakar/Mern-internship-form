@@ -129,3 +129,43 @@ button:hover {
   background: #4a6cf7;
   margin: 5px;
 }
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+
+  .login-box {
+    width: 90%;
+  }
+
+  input,
+  select {
+    width: 100%;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+.logout-btn {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-bottom: 15px;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+}
